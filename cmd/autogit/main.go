@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/mail"
 	"os"
@@ -35,6 +36,9 @@ Great for developers who commit often and want cleaner, faster git usage.`,
 		Action: func(cCtx context.Context, cmd *cli.Command) error {
 			if cmd.Bool("diff") {
 				// handle the logic here
+				fmt.Println("test")
+			} else {
+				fmt.Println("test  false")
 			}
 			return nil
 		},
