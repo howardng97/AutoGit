@@ -4,6 +4,6 @@ type DiffCommandHandler struct {
 	Diff bool
 }
 
-func (dh *DiffCommandHandler) Process() (success bool, err error) {
-	return false, nil
+func (dh *DiffCommandHandler) Process() (string, error) {
+	return "You call --diff", nil
 }

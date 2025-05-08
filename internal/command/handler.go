@@ -1,15 +1,36 @@
 package command
 
-import "github.com/howardng97/AutoGit/internal/command/diff"
+import "fmt"
 
-type CommandHanlder struct {
-	Flag string
+type CommandHandler struct {
+	Flag    string
+	Handler map[string]CommandProcess
 }
 
-func (ch *CommandHanlder) Process() (success bool, err error) {
-	if ch.Flag == "--diff" || ch.Flag == "-d" {
-		handler := diff.DiffCommandHandler{Diff: true}
-		handler.Process()
+// NewCommandHandler initializes a new handler
+func NewCommandHandler() *CommandHandler {
+	return &CommandHandler{
+		Handler: make(map[string]CommandProcess),
 	}
-	return false, nil
+}
+
+// RegisterCommand adds a new command to the handler
+func (ch *CommandHandler) RegisterCommand(name string, handler CommandProcess) {
+	ch.Handler[name] = handler
+}
+
+// Process executes the command based on the flag
+func (ch *CommandHandler) Process() {
+	handler, exists := ch.Handler[ch.Flag]
+	if !exists {
+		fmt.Printf("Error: Command '%s' not found\n", ch.Flag)
+		return
+	}
+
+	info, err := handler.Process()
+	if err != nil {
+		fmt.Printf("Error executing '%s': %v\n", ch.Flag, err)
+		return
+	}
+	fmt.Println("Success:", info)
 }

@@ -8,10 +8,13 @@ import (
 	"os"
 
 	"github.com/urfave/cli/v3"
+
+	"github.com/howardng97/AutoGit/internal/command"
+	"github.com/howardng97/AutoGit/internal/command/diff"
 )
 
 func main() {
-	var diff bool
+	ch := command.NewCommandHandler()
 	cmd := &cli.Command{
 		Authors: []any{
 			mail.Address{Name: "Howard Nguyen", Address: "longng977@gmail.com"},
@@ -25,22 +28,32 @@ func main() {
 - Pushes to the current branch
 
 Great for developers who commit often and want cleaner, faster git usage.`,
-		Flags: []cli.Flag{
-			&cli.BoolFlag{
+		Commands: []*cli.Command{
+			{
 				Name:        "diff",
-				Usage:       "Include git diff summary in the commit message",
-				Aliases:     []string{"d"},
-				Destination: &diff,
+				Category:    "Auto add different to the commit message",
+				Usage:       "autogit diff",
+				UsageText:   "diff - add different to the commit",
+				Description: "no really, there is a lot of dooing to be done",
+				ArgsUsage:   "[arrgh]",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{Name: "forever", Aliases: []string{"forevvarr"}},
+				},
+				Before: func(ctx context.Context, cmd *cli.Command) (context.Context, error) {
+					ch.RegisterCommand("diff", &diff.DiffCommandHandler{})
+					return nil, nil
+				},
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					if cmd.Bool("forever") {
+						cmd.Run(ctx, nil)
+					}
+					return nil
+				},
+				OnUsageError: func(ctx context.Context, cmd *cli.Command, err error, isSubcommand bool) error {
+					fmt.Fprintf(cmd.Root().Writer, "for shame\n")
+					return err
+				},
 			},
-		},
-		Action: func(cCtx context.Context, cmd *cli.Command) error {
-			if cmd.Bool("diff") {
-				// handle the logic here
-				fmt.Println("test")
-			} else {
-				fmt.Println("test  false")
-			}
-			return nil
 		},
 	}
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
